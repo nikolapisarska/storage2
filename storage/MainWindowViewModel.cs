@@ -14,21 +14,20 @@ public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly StorageService _storageService;
 
-    // --- Sekcja Skanowania ---
+    // Sekcja Skanowania 
     private string _scanInput = string.Empty;
     
-    // ZMIANA: Zmiana typu na int?, aby bezpiecznie obsługiwać puste wartości z UI
-    private int? _scanQuantity = 1; 
+       private int? _scanQuantity = 1; 
 
-    // --- Zakładka 1: Kompletacja do kartonu ---
+    // Zakładka 1: Kompletacja do kartonu 
     private Box _currentPackingBox = new Box();
     private ObservableCollection<BoxItem> _currentBoxItems = new ObservableCollection<BoxItem>();
 
-    // --- Zakładka 2: Podgląd zawartości ---
+    //  Zakładka 2: Podgląd zawartości 
     private string _searchBoxInput = string.Empty;
     private Box? _scannedResultBox;
 
-    // --- Pasek statusu (na dole okna) ---
+    // Pasek statusu (na dole okna) 
     private string _statusMessage = "Gotowy do pracy. Zeskanuj produkt, aby rozpocząć.";
 
     public MainWindowViewModel()
@@ -51,8 +50,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         get => _scanInput;
         set { _scanInput = value; OnPropertyChanged(); }
     }
-
-    // ZMIANA: Właściwość akceptuje teraz wartości null oraz zabezpiecza przed wpisaniem wartości < 1
     public int? ScanQuantity
     {
         get => _scanQuantity;
@@ -284,7 +281,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SearchBoxInput = string.Empty; 
     }
     private int _selectedTabIndex = 0;
-
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;

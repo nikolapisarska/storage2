@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:storage"
+             xmlns:model="using:storage.Model"
+             x:Class="storage.MainView"
+             x:DataType="local:MainWindowViewModel"
+             x:CompileBindings="False">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="ClipValueToMinMax" Value="True"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="*, Auto" Margin="15">
+        <TabControl Grid.Row="0" x:Name="MainTabControl" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+            
+            <TabItem Header=" Kompletacja do kartonu" FontSize="16">
+                <Grid ColumnDefinitions="2*, 3*" Margin="10">
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <Grid ColumnDefinitions="3*, *" RowDefinitions="Auto, Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Zeskanuj produkt (Kod / Indeks):" FontWeight="Bold" Foreground="#2b579a"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Ilość:" FontWeight="Bold" Foreground="#2b579a" Margin="5,0,0,0"/>
+                            
+                            <TextBox x:Name="ProductInput" 
+                                     Grid.Row="1" 
+                                     Grid.Column="0" 
+                                     PlaceholderText="Czekam na skan..." 
+                                     Text="{Binding ScanInput, Mode=TwoWay}">
+                                <TextBox.KeyBindings>
+                                    <KeyBinding Gesture="Enter" Command="{Binding ProductScannedCommand}"/>
+                                </TextBox.KeyBindings>
+                            </TextBox>
+                            
+                            <NumericUpDown x:Name="QuantityInput" 
+                                           Grid.Row="1" Grid.Column="1" 
+                                           Value="{Binding ScanQuantity, Mode=TwoWay, TargetNullValue=1}" 
+                                           Minimum="1" 
+                                           Maximum="999" 
+                                           Increment="1" 
+                                           FormatString="0" 
+                                           Margin="5,5,0,15"/>
+                        </Grid>
+
+                        <Border Height="1" Background="Gray" Margin="0,5,0,15"/>
+                        <TextBlock Text="Kod kartonu (opcjonalny / z API):" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox Watermark="Wpisz kod kartonu lub zostaw puste dla auto-generowania" 
+                                 Text="{Binding PackingBoxCode, Mode=TwoWay}"/>
+
+                        <Border Height="1" Background="Gray" Margin="0,5,0,15"/>
+                        <TextBlock Text="Wymiary opakowania (cm):" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Szerokość"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Wysokość"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Długość"/>
+                            
+                            <NumericUpDown Grid.Row="1" Grid.Column="0" 
+                                           Value="{Binding PackingWidth, Mode=TwoWay, TargetNullValue=0}" 
+                                           Minimum="0" Increment="0.5" FormatString="0.0" Margin="0,5,5,15"/>
+                            <NumericUpDown Grid.Row="1" Grid.Column="1" 
+                                           Value="{Binding PackingHeight, Mode=TwoWay, TargetNullValue=0}" 
+                                           Minimum="0" Increment="0.5" FormatString="0.0" Margin="5,5,5,15"/>
+                            <NumericUpDown Grid.Row="1" Grid.Column="2" 
+                                           Value="{Binding PackingLength, Mode=TwoWay, TargetNullValue=0}" 
+                                           Minimum="0" Increment="0.5" FormatString="0.0" Margin="5,5,0,15"/>
+                        </Grid>
+
+                        <TextBlock Text="Waga całkowita (kg):" FontWeight="Bold" Margin="0,10,0,0"/>
+                        <NumericUpDown Value="{Binding PackingWeight, Mode=TwoWay, TargetNullValue=0}" 
+                                       Minimum="0" Increment="0.01" FormatString="0.00" Margin="0,5,0,15"/>
+
+                        <Button Content="ZAPISZ KARTON" 
+                                Background="#2d89ef" Foreground="White" 
+                                FontWeight="Bold" Padding="15" 
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Command="{Binding SaveBoxCommand}"
+                                Click="SaveBoxButton_Click"/>
+                    </StackPanel>
+
+                    <Grid Grid.Column="1" RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Aktualna zawartość kartonu:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding CurrentBoxItems}" 
+                                  AutoGenerateColumns="False" IsReadOnly="False" 
+                                  GridLinesVisibility="All" BorderThickness="1" BorderBrush="LightGray">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Kod Graffiti" Binding="{Binding Product.CodeOrIdGraffiti}" IsReadOnly="True" Width="*"/>
+                                <DataGridTextColumn Header="Nazwa Artykułu" Binding="{Binding Product.Name}" IsReadOnly="True" Width="2*"/>
+                                
+                                <DataGridTemplateColumn Header="Ilość (szt.)" Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Quantity}" VerticalAlignment="Center" Margin="10,0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <NumericUpDown Value="{Binding Quantity, Mode=TwoWay, TargetNullValue=1}" 
+                                                           Minimum="1" Maximum="9999" Increment="1" FormatString="0"
+                                                           VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                                
+                                <DataGridTemplateColumn Header="Akcje" Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Usuń" 
+                                                    Background="#e51400" Foreground="White" FontSize="12"
+                                                    Padding="8,4" Margin="4"
+                                                    Command="{Binding $parent[Window].DataContext.RemoveProductCommand}"
+                                                    CommandParameter="{Binding}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Podgląd zawartości" FontSize="16">
+                <Grid RowDefinitions="Auto, Auto, *" Margin="10">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,15">
+                        <TextBlock Text="Zeskanuj kod kartonu:" FontWeight="Bold"/>
+                        <TextBox x:Name="SearchBoxInputControl"
+                                 Width="300" PlaceholderText="Wpisz lub zeskanuj kod pudła..." 
+                                 Text="{Binding SearchBoxInput, Mode=TwoWay}" VerticalAlignment="Center" Margin="0">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding BoxScannedCommand}"/>
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="Black" Padding="10" CornerRadius="4" Margin="0,0,0,15">
+                        <StackPanel Orientation="Horizontal" Spacing="30">
+                            <StackPanel>
+                                <TextBlock Text="Kod kartonu:" Foreground="Gray"/>
+                                <TextBlock Text="{Binding ScannedResultBox.BoxCode, FallbackValue='---'}" FontSize="16" FontWeight="Bold" Foreground="Green"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Wymiary (Sz x Wy x Dł):" Foreground="Gray"/>
+                                <TextBlock FontSize="16">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} x {1} x {2} cm">
+                                            <Binding Path="ScannedResultBox.Width" FallbackValue="0" TargetNullValue="0"/>
+                                            <Binding Path="ScannedResultBox.Height" FallbackValue="0" TargetNullValue="0"/>
+                                            <Binding Path="ScannedResultBox.Length" FallbackValue="0" TargetNullValue="0"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Waga kartonu:" Foreground="Gray"/>
+                                <TextBlock FontSize="16" FontWeight="Bold">
+                                    <Run Text="{Binding ScannedResultBox.Weight, FallbackValue='0'}"/>
+                                    <Run Text=" kg"/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <Button Content="EDYTUJ TEN KARTON" 
+                                    Background="#e3a21a" Foreground="White" FontWeight="Bold" 
+                                    VerticalAlignment="Center" Margin="20,0,0,0" Padding="10,6"
+                                    Command="{Binding EditScannedBoxCommand}"
+                                    IsVisible="{Binding ScannedResultBox, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        </StackPanel> 
+                    </Border>
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding ScannedResultBox.Items}" 
+                              AutoGenerateColumns="False" IsReadOnly="True" 
+                              GridLinesVisibility="All" BorderThickness="1" BorderBrush="LightGray">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Kod z Graffiti" Binding="{Binding Product.CodeOrIdGraffiti}" x:DataType="model:BoxItem" Width="*"/>
+                            <DataGridTextColumn Header="Nazwa towaru" Binding="{Binding Product.Name}" x:DataType="model:BoxItem" Width="2*"/>
+                            <DataGridTextColumn Header="Sztuk" Binding="{Binding Quantity}" x:DataType="model:BoxItem" Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Border Grid.Row="1" Background="#2b579a" Margin="-15,10,-15,-15" Padding="8,5">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+        </Border>
+    </Grid>
+</UserControl>

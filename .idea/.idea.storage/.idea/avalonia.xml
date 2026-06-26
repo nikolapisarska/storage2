@@ -3,6 +3,8 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="storage/App.axaml" value="storage/storage.csproj" />
+        <entry key="storage/MainView.axaml" value="storage/storage.csproj" />
         <entry key="storage/MainWindow.axaml" value="storage/storage.csproj" />
       </map>
     </option>
