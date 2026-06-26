@@ -28,6 +28,16 @@ public partial class MainWindow : Window
         MainTabControl.SelectionChanged += MainTabControl_SelectionChanged;
     }
 
+    // Metoda obsługująca kliknięcie przycisku ZAPISZ KARTON (przeniesiona poza konstruktor)
+    private void SaveBoxButton_Click(object? sender, RoutedEventArgs e)
+    {
+        // Używamy Dispatchera, aby upewnić się, że focus zostanie ustawiony po zakończeniu procesów czyszczenia pól w UI
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            ProductInput.Focus();
+        });
+    }
+
     // Nowa, bezwzględna metoda obsługi Enter w polu ilości
     private void QuantityInput_KeyDown(object? sender, KeyEventArgs e)
     {

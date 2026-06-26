@@ -4,7 +4,7 @@
         xmlns:model="using:storage.Model"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="400"
         x:Class="storage.MainWindow"
         x:DataType="local:MainWindowViewModel"
         x:CompileBindings="False"
@@ -89,7 +89,8 @@
                                 Background="#2d89ef" Foreground="White" 
                                 FontWeight="Bold" Padding="15" 
                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                Command="{Binding SaveBoxCommand}"/>
+                                Command="{Binding SaveBoxCommand}"
+                                Click="SaveBoxButton_Click"/>
                     </StackPanel>
 
                     <Grid Grid.Column="1" RowDefinitions="Auto, *">
@@ -123,7 +124,7 @@
                                 <DataGridTemplateColumn Header="Akcje" Width="Auto">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="❌ Usuń" 
+                                            <Button Content="Usuń" 
                                                     Background="#e51400" 
                                                     Foreground="White" 
                                                     FontSize="12"
@@ -180,7 +181,7 @@
                                 </TextBlock>
                             </StackPanel>
 
-                            <Button Content="✏️ EDYTUJ TEN KARTON" 
+                            <Button Content="EDYTUJ TEN KARTON" 
                                     Background="#e3a21a" 
                                     Foreground="White" 
                                     FontWeight="Bold" 
