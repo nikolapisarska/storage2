@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace storage;
 
@@ -17,6 +18,9 @@ public partial class MainWindow : Window
         // 2. Obsługa Enter w pierwszym polu (kompletacja)
         ProductInput.KeyDown += ProductInput_KeyDown;
         
+        // Przechwytujemy Enter za pomocą strategii Tunnel (zanim dotrze do wnętrza NumericUpDown)
+        QuantityInput.AddHandler(InputElement.KeyDownEvent, QuantityInput_KeyDown, RoutingStrategies.Tunnel);
+        
         // 3. Obsługa Enter w drugim polu (podgląd)
         SearchBoxInputControl.KeyDown += SearchBoxInputControl_KeyDown;
 
@@ -24,12 +28,32 @@ public partial class MainWindow : Window
         MainTabControl.SelectionChanged += MainTabControl_SelectionChanged;
     }
 
+    // Nowa, bezwzględna metoda obsługi Enter w polu ilości
+    private void QuantityInput_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            // Zatrzymujemy dalsze przetwarzanie klawisza przez system Avalonia
+            e.Handled = true;
+
+            // Ręcznie wywołujemy komendę zapisu/skanowania z ViewModelu
+            if (DataContext is MainWindowViewModel viewModel && viewModel.ProductScannedCommand.CanExecute(null))
+            {
+                viewModel.ProductScannedCommand.Execute(null);
+            }
+
+            // Przenosimy kursor z powrotem do pola kodu produktu
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                ProductInput.Focus();
+            });
+        }
+    }
+
     private void MainTabControl_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        // Sprawdzamy, która zakładka (TabItem) jest aktualnie wybrana
         if (MainTabControl.SelectedItem is TabItem selectedTab)
         {
-            // Jeśli wybraliśmy zakładkę z podglądem zawartości
             if (selectedTab.Header?.ToString() == "Podgląd zawartości")
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
@@ -37,7 +61,6 @@ public partial class MainWindow : Window
                     SearchBoxInputControl.Focus();
                 });
             }
-            // Jeśli wróciliśmy do kompletacji
             else if (selectedTab.Header?.ToString() == " Kompletacja do kartonu")
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
@@ -61,7 +84,6 @@ public partial class MainWindow : Window
     
     private void SearchBoxInputControl_KeyDown(object? sender, KeyEventArgs e)
     {
-        // Po zeskanowaniu kodu kartonu w podglądzie, również odświeżamy focus
         if (e.Key == Key.Enter)
         {
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>

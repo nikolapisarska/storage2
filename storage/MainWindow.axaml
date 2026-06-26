@@ -48,7 +48,8 @@
                                 </TextBox.KeyBindings>
                             </TextBox>
                             
-                            <NumericUpDown Grid.Row="1" Grid.Column="1" 
+                            <NumericUpDown x:Name="QuantityInput" 
+                                           Grid.Row="1" Grid.Column="1" 
                                            Value="{Binding ScanQuantity, Mode=TwoWay, TargetNullValue=1}" 
                                            Minimum="1" 
                                            Maximum="999" 

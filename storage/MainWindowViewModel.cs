@@ -168,13 +168,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
             if (existingItem != null)
             {
-                // ZMIANA: Przypisanie bezpiecznej, wyliczonej ilości
                 existingItem.Quantity += finalQuantity;
             }
             else
             {
-                // ZMIANA: Przypisanie bezpiecznej, wyliczonej ilości
-                CurrentBoxItems.Add(new BoxItem { Product = product, Quantity = finalQuantity });
+                    CurrentBoxItems.Add(new BoxItem { Product = product, Quantity = finalQuantity });
             }
 
             StatusMessage = $"Dodano: {product.Name} (sztuk: {finalQuantity})";
