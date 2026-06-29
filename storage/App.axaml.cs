@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using storage;
+
 namespace storage;
 
 public partial class App : Application
@@ -17,6 +17,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Jeśli uruchamiamy na komputerze: tworzymy tradycyjne okno
             desktop.MainWindow = new MainWindow
             {
                 DataContext = sharedViewModel
@@ -24,6 +25,7 @@ public partial class App : Application
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
+            // Jeśli uruchamiamy na Androidzie (skanerze): wstrzykujemy MainView bezpośrednio na pełny ekran
             singleViewPlatform.MainView = new MainView
             {
                 DataContext = sharedViewModel
